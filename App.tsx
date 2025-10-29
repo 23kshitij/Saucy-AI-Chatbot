@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect, useRef } from 'react';
 import { Role } from './types';
 import type { ChatMessage } from './types';
@@ -11,7 +10,7 @@ const App: React.FC = () => {
   const [messages, setMessages] = useState<ChatMessage[]>([
     {
       role: Role.MODEL,
-      text: "Hello! I'm your personal low-carb chef. Show me a picture of your ingredients, or tell me what you have, and I'll suggest a delicious recipe for you!",
+      text: "Hello! I'm your personal cooking assistant. Show me a picture of your ingredients, or tell me what you have, and I'll help you find a delicious recipe!",
     },
   ]);
   const [isLoading, setIsLoading] = useState(false);
@@ -62,13 +61,15 @@ const App: React.FC = () => {
   );
 
   return (
-    <div className="flex flex-col h-screen bg-gray-100 font-sans">
-      <header className="bg-white/80 backdrop-blur-sm border-b border-gray-200 shadow-sm p-4 z-10">
+    <div 
+        className="flex flex-col h-screen font-sans bg-gray-50"
+    >
+      <header className="bg-white border-b border-gray-200 shadow-sm p-4 z-10">
         <div className="max-w-4xl mx-auto flex items-center">
             <div className="bg-green-100 text-green-600 p-2 rounded-full">
                 <ChefHatIcon />
             </div>
-            <h1 className="text-xl font-bold text-gray-800 ml-3">AI Low-Carb Chef</h1>
+            <h1 className="text-xl font-bold text-gray-800 ml-3">Saucy AI</h1>
         </div>
       </header>
 

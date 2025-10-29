@@ -1,6 +1,13 @@
+import React, { useState, useRef, useEffect } from 'react';
+import { PaperclipIcon, SendIcon, XIcon, MicrophoneIcon } from './icons';
 
-import React, { useState, useRef } from 'react';
-import { PaperclipIcon, SendIcon, XIcon } from './icons';
+// Fix: Add types for the Web Speech API to the window object to resolve TypeScript errors.
+declare global {
+  interface Window {
+    SpeechRecognition: any;
+    webkitSpeechRecognition: any;
+  }
+}
 
 interface ChatInputProps {
   onSend: (text: string, image: string | null) => void;
@@ -10,7 +17,34 @@ interface ChatInputProps {
 const ChatInput: React.FC<ChatInputProps> = ({ onSend, isLoading }) => {
   const [text, setText] = useState('');
   const [imagePreview, setImagePreview] = useState<string | null>(null);
+  const [isRecording, setIsRecording] = useState(false);
+  const [isSpeechRecognitionSupported, setIsSpeechRecognitionSupported] = useState(false);
+  
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const recognitionRef = useRef<any>(null); // Using `any` for SpeechRecognition for cross-browser compatibility
+
+  useEffect(() => {
+    const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+    if (SpeechRecognition) {
+      setIsSpeechRecognitionSupported(true);
+      const recognition = new SpeechRecognition();
+      recognition.continuous = false;
+      recognition.interimResults = false;
+      recognition.lang = 'en-US';
+
+      recognition.onstart = () => setIsRecording(true);
+      recognition.onend = () => setIsRecording(false);
+      recognition.onerror = (event: any) => {
+        console.error('Speech recognition error:', event.error);
+        setIsRecording(false);
+      };
+      recognition.onresult = (event: any) => {
+        const transcript = event.results[0][0].transcript;
+        setText(prevText => (prevText ? prevText + ' ' : '') + transcript);
+      };
+      recognitionRef.current = recognition;
+    }
+  }, []);
 
   const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
@@ -41,8 +75,17 @@ const ChatInput: React.FC<ChatInputProps> = ({ onSend, isLoading }) => {
       }
   }
 
+  const handleToggleRecording = () => {
+    if (!recognitionRef.current) return;
+    if (isRecording) {
+      recognitionRef.current.stop();
+    } else {
+      recognitionRef.current.start();
+    }
+  };
+
   return (
-    <div className="bg-white/80 backdrop-blur-sm border-t border-gray-200 p-4">
+    <div className="bg-white border-t border-gray-200 p-4">
       <form onSubmit={handleSend} className="max-w-4xl mx-auto">
         {imagePreview && (
           <div className="relative w-32 h-32 mb-2 rounded-lg overflow-hidden border border-gray-300">
@@ -75,6 +118,21 @@ const ChatInput: React.FC<ChatInputProps> = ({ onSend, isLoading }) => {
           >
             <PaperclipIcon className="w-6 h-6" />
           </button>
+          
+          {isSpeechRecognitionSupported && (
+             <button
+                type="button"
+                onClick={handleToggleRecording}
+                disabled={isLoading}
+                className={`p-2 transition-colors disabled:text-gray-300 ${
+                    isRecording ? 'text-red-500 animate-pulse' : 'text-gray-500 hover:text-green-600'
+                }`}
+                aria-label={isRecording ? 'Stop recording' : 'Start recording'}
+             >
+                <MicrophoneIcon className="w-6 h-6" />
+             </button>
+          )}
+
           <input
             type="text"
             value={text}

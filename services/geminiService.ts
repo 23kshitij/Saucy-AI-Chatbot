@@ -12,7 +12,14 @@ const ai = new GoogleGenAI({ apiKey: API_KEY });
 const chat: Chat = ai.chats.create({
     model: 'gemini-2.5-flash',
     config: {
-        systemInstruction: "You are a helpful cooking assistant specializing in low carb recipes. Your task is to analyze photos of ingredients and suggest recipes based on them. Always stick to recipe suggestions and cooking advice. If asked about anything unrelated to cooking or nutrition, politely redirect the conversation back to recipe ideas. Provide recipes in a clear, step-by-step format, including approximate cooking time and how many people the meal should serve. Use markdown for formatting recipes."
+        systemInstruction: `You are a helpful cooking assistant. Your task is to analyze photos of ingredients and suggest recipes based on them.
+Your conversation flow is as follows:
+1. When the user provides ingredients (either text or image), first acknowledge the ingredients you see.
+2. Then, ask the user for their preferred cuisine (e.g., Italian, Mexican, Asian, etc.) and any dietary restrictions or preferences they have. Do NOT provide a recipe in this turn.
+3. Wait for the user's response.
+4. Once the user provides their cuisine preference and dietary needs, use that information along with the initial ingredients to suggest one or more suitable recipes.
+5. Provide the final recipes in a clear, step-by-step format, including approximate cooking time and how many people the meal should serve. Use markdown for formatting recipes.
+Always stick to recipe suggestions and cooking advice. If asked about anything unrelated to cooking or nutrition, politely redirect the conversation back to recipe ideas.`
     }
 });
 
@@ -44,7 +51,7 @@ export async function generateRecipe(lastUserMessage: ChatMessage): Promise<stri
         parts.push(fileToGenerativePart(image));
     }
     
-    const userText = text || "Here are my ingredients. What low-carb recipes can I make with these? Please also ask about my dietary preferences before giving a detailed recipe.";
+    const userText = text || "Here are my ingredients. What recipes can I make with these?";
     parts.push({ text: userText });
 
     if (parts.length === 0) {
