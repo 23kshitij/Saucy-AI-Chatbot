@@ -1,10 +1,11 @@
+
 import React, { useState, useEffect, useRef } from 'react';
 import { Role } from './types';
 import type { ChatMessage } from './types';
 import { generateRecipe } from './services/geminiService';
 import ChatInput from './components/ChatInput';
 import ChatMessageComponent from './components/ChatMessage';
-import { ChefHatIcon } from './components/icons';
+import SaucyAiLogo from './components/SaucyAiLogo';
 
 const App: React.FC = () => {
   const [messages, setMessages] = useState<ChatMessage[]>([
@@ -46,12 +47,10 @@ const App: React.FC = () => {
 
   const TypingIndicator = () => (
     <div className="flex items-start my-4 flex-row">
-      <div className="flex-shrink-0 w-10 h-10 rounded-full flex items-center justify-center bg-gray-200 text-gray-600 mr-3">
-        <ChefHatIcon />
-      </div>
-      <div className="px-4 py-3 rounded-2xl max-w-sm bg-white text-gray-800 rounded-bl-none border border-gray-200 shadow-md">
+      <SaucyAiLogo className="flex-shrink-0 w-10 h-10 text-gray-800 mr-3" />
+      <div className="px-4 py-3 rounded-2xl max-w-sm bg-white/95 backdrop-blur-sm text-gray-800 rounded-bl-none border border-gray-200 shadow-md">
         <div className="flex items-center justify-center space-x-1">
-            <span className="text-sm text-gray-500">Chef is thinking</span>
+            <span className="text-sm text-gray-500">AI is thinking</span>
             <div className="w-2 h-2 bg-gray-400 rounded-full animate-bounce [animation-delay:-0.3s]"></div>
             <div className="w-2 h-2 bg-gray-400 rounded-full animate-bounce [animation-delay:-0.15s]"></div>
             <div className="w-2 h-2 bg-gray-400 rounded-full animate-bounce"></div>
@@ -62,18 +61,24 @@ const App: React.FC = () => {
 
   return (
     <div 
-        className="flex flex-col h-screen font-sans bg-gray-50"
+        className="flex flex-col h-screen font-sans"
     >
       <header className="bg-white border-b border-gray-200 shadow-sm p-4 z-10">
-        <div className="max-w-4xl mx-auto flex items-center">
-            <div className="bg-green-100 text-green-600 p-2 rounded-full">
-                <ChefHatIcon />
-            </div>
-            <h1 className="text-xl font-bold text-gray-800 ml-3">Saucy AI</h1>
+        <div className="max-w-4xl mx-auto flex items-center gap-3">
+            <SaucyAiLogo className="w-10 h-10 text-gray-800" />
+            <h1 className="text-xl font-bold text-gray-800">Saucy AI</h1>
         </div>
       </header>
 
-      <main className="flex-grow overflow-y-auto p-4">
+      <main 
+        className="flex-grow overflow-y-auto p-4"
+        style={{
+            backgroundImage: `url('https://images.pexels.com/photos/3186653/pexels-photo-3186653.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=2')`,
+            backgroundSize: 'cover',
+            backgroundPosition: 'center',
+            backgroundAttachment: 'fixed'
+        }}
+      >
         <div className="max-w-4xl mx-auto">
           {messages.map((msg, index) => (
             <ChatMessageComponent key={index} message={msg} />
